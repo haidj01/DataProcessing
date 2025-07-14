@@ -12,6 +12,7 @@ public class DataProcessJobManager {
     static {
         JOB_MAP.put("BASE", new BaseProcessJob());
         JOB_MAP.put("COLLECT", new CollectProcessJob());
+        JOB_MAP.put("SCHEMA", new DeltaSchema());
     }
 
     public static void executeJob(String[] args){
