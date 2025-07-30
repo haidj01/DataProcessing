@@ -3,15 +3,10 @@ package com.dkim.dataprocessing.kafka;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.streaming.StreamingQuery;
-import org.apache.spark.sql.streaming.StreamingQueryException;
-import org.apache.spark.sql.streaming.Trigger;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.TimeoutException;
 import static org.apache.spark.sql.functions.*;
 
 public class SparkKafkaPublisher {
@@ -46,7 +41,6 @@ public class SparkKafkaPublisher {
             System.out.println("Topic: " + topicName);
             System.out.println("Records: " + dataset.count());
 
-            // Kafka 메시지 형태로 변환
             Dataset<Row> kafkaData = prepareKafkaMessage(dataset, topicName);
 
             kafkaData.write()
@@ -80,46 +74,6 @@ public class SparkKafkaPublisher {
             .select(col("value"));
     }
 
-    /**
-     * 직원 이벤트 발행
-     */
-    private void publishEmployeeEvents(SparkSession session, Dataset<Row> dataset) {
-        Dataset<Row> empData = dataset
-            .filter(col("name").isNotNull())
-            .withColumn("event_type", lit("employee_update"))
-            .select("id", "name", "email", "event_type");
-
-        if (empData.count() > 0) {
-            publishBatchToKafka(session, empData, "employee_events");
-        }
-    }
-
-    /**
-     * 위치 이벤트 발행
-     */
-    private void publishLocationEvents(SparkSession session, Dataset<Row> dataset) {
-        Dataset<Row> locationData = dataset
-            .filter(col("location").isNotNull())
-            .withColumn("event_type", lit("location_update"))
-            .select("id", "location", "city", "state", "event_type");
-
-        if (locationData.count() > 0) {
-            publishBatchToKafka(session, locationData, "location_events");
-        }
-    }
-
-    /**
-     * 감사 이벤트 발행
-     */
-    private void publishAuditEvents(SparkSession session, Dataset<Row> dataset) {
-        Dataset<Row> auditData = dataset
-            .withColumn("event_type", lit("data_change"))
-            .withColumn("audit_timestamp", current_timestamp())
-            .withColumn("source", lit("spark_job"))
-            .select("id", "event_type", "audit_timestamp", "source");
-
-        publishBatchToKafka(session, auditData, "audit_events");
-    }
 
     /**
      * 배치별 Kafka 처리
