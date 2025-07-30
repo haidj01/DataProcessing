@@ -14,7 +14,7 @@ public class CollectProcessJob implements DataProcess {
     @Override
     public void execute(SparkSession session) {
         String path = ConfigUtil.getConfig(session,"spark.collect.path");
-        Dataset<Row> ds = CSVUtil.loadCsv(session,path);
+        Dataset<Row> ds = CSVUtil.loadCsv(session,path,null);
 
         ds = ds.groupBy("id").agg(
             collect_list(

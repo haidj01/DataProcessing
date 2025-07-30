@@ -15,7 +15,7 @@ public class BaseProcessJob implements DataProcess {
     public void execute(SparkSession session) {
 
         final String path = ConfigUtil.getConfig(session, "spark.base.path");
-        Dataset<Row> ds = CSVUtil.loadCsv(session, path);
+        Dataset<Row> ds = CSVUtil.loadCsv(session, path, null);
         ds = ds.withColumn("base_flag",
             when( col("base").equalTo(lit(1.0)), true)
                 .otherwise(lit(false)));
