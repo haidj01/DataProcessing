@@ -24,6 +24,7 @@ dependencies {
     //implementation("io.delta:delta-core_2.12:3.1.0")
     implementation("io.delta:delta-spark_2.12:3.1.0")
     implementation("org.scala-lang:scala-library:2.12.18")
+    implementation("org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.0")
     testImplementation ("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }

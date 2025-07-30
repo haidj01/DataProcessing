@@ -30,6 +30,8 @@ public class SparkSessionUtil {
         return builder
             .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
             .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+            .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.0")
+
 //            // 로컬 파일 시스템 설정 수정
 //            .config("spark.hadoop.fs.file.impl", "org.apache.hadoop.fs.LocalFileSystem")
 //            .config("spark.hadoop.fs.file.impl.disable.cache", "true")

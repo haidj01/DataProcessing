@@ -1,5 +1,6 @@
 package com.dkim.dataprocessing.job;
 
+import com.dkim.dataprocessing.kafka.SparkKafkaPublisher;
 import com.dkim.dataprocessing.util.ConfigUtil;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -16,6 +17,7 @@ public class EmployeeGlobalPublishJob implements DataProcess {
 
     @Override
     public void execute(SparkSession session) throws TimeoutException, StreamingQueryException {
+        SparkKafkaPublisher publisher  = new SparkKafkaPublisher("localhost:9092");
         Dataset<Row> empCdc = session
             .readStream()
             .format("delta")
@@ -34,7 +36,7 @@ public class EmployeeGlobalPublishJob implements DataProcess {
                     .join(ConfigUtil.getDeltaTable(session, "emp_global").toDF().as("target"),
                     col("source.id").equalTo(col("target.id")));
                 updatedEmpGlobal.show(false);
-
+                publisher.publishBatchToKafka(session, updatedEmpGlobal ,"input-topic");
             })
             .trigger(Trigger.ProcessingTime("15 seconds"))
             .start();
